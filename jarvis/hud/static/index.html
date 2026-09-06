@@ -6,24 +6,35 @@
 <title>J.A.R.V.I.S.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Rajdhani is the only font the default JARVIS canvas look needs. -->
+<!-- Rajdhani is the default canvas JARVIS look. The rest
+     (handoff/HUD-STYLE.md's DOM/CSS skins) share one request per the spec:
+     Chakra Petch is their base type, Titan One/Bungee/Nunito/Press Start
+     2P+VT323/Orbitron are the per-skin display faces. Loaded together since
+     a skin can switch anytime. -->
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;600&display=swap"
       rel="stylesheet">
 <link rel="stylesheet" href="/static/hud.css">
+<!-- handoff/hud-skins.css verbatim: every skin's @keyframes and per-skin
+     animation class (exact durations), per handoff/ANIMATION.md. Loaded
+     before skins.css so this project's own defaults (skins.js) still win
+     for the --spd/--vx/--imm custom properties. -->
+<link rel="stylesheet" href="/static/hud-skins.css">
+<!-- handoff/hud-states.css verbatim: the four-state machine's thinking
+     indicators (A/B/C/D) and per-skin voice-ring treatments, per
+     handoff/STATES.md. Imported after hud-skins.css as instructed. -->
+<link rel="stylesheet" href="/static/hud-states.css">
 <link rel="stylesheet" href="/static/skins.css">
 </head>
 <body>
-  <!-- One canvas. Everything is drawn; nothing here is a widget. This is
-       the whole interface. -->
+  <!-- One canvas. Everything is drawn; nothing here is a widget. This stays
+       the whole interface for the default JARVIS look. -->
   <canvas id="hud"></canvas>
 
-  <!-- Empty on purpose: skins.js's shared layer-stack engine (applyState,
-       feedVoice, activate, sync) reads/writes this element unconditionally
-       from hud.js's main loop every frame, so it must exist even though
-       this build ships no DOM/CSS skins to put inside it. skins.css keeps
-       it hidden while the canvas theme (the only theme here) is active. -->
+  <!-- The DOM/CSS "world" renderer for the reskinned themes (handoff/HUD-STYLE.md).
+       Hidden and inert while the canvas theme above is active; see skins.css. -->
   <div id="skins-root" class="hud-root">
-    <div id="skins-inner"></div>
+    <div id="skins-inner">
+          </div>
     <div id="skins-flash"></div>
     <div id="skins-vignette"></div>
   </div>
@@ -36,6 +47,15 @@
   <script src="/static/waveform.js"></script>
   <script src="/static/reactor.js"></script>
   <script src="/static/skins.js"></script>
+
+
+
+
+
+
+
+
+
   <script src="/static/themes.js"></script>
   <script src="/static/panels.js"></script>
   <script src="/static/boot.js"></script>

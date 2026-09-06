@@ -33,7 +33,8 @@ make hud       # open the running HUD in Chrome, app mode
 Optional: an [ElevenLabs](https://elevenlabs.io) API key gets you a noticeably
 better voice than the built-in `say -v Daniel` fallback. Copy `.env.example`
 to `.env` and fill in what you want to change — every setting is documented
-there, and nothing in it is required to get started.
+there, and nothing in it is required to get started. Once you have a key, run
+`make voices` to audition British voices and pick one automatically.
 
 ## What it can do
 

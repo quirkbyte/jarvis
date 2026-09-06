@@ -34,9 +34,10 @@
     }
   };
 
-  // This build ships only the default canvas look. The DOM/CSS skins
-  // (skin-*.js/skin-*.css, per handoff/HUD-STYLE.md) are a separate add-on
-  // and aren't part of this repo.
+  // Every id below except 'reactor' is a DOM/CSS skin (skin-*.js/
+  // skin-*.css), per handoff/HUD-STYLE.md. 'gd2' is last, on purpose — it
+  // inverts the light/dark assumption and is the best place to catch any
+  // hardcoded light-on-dark text left over from the other nine.
   var ORDER = ['reactor'];
 
   function registry() {

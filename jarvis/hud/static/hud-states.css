@@ -1,0 +1,189 @@
+/* ============================================================
+   JARVIS HUD — conversation states: THINKING + VOICE RING
+   Companion to hud-skins.css. Import after it:
+       @import "hud-skins.css";
+       @import "hud-states.css";
+   Uses the same --spd / --vx / --imm variables. No colors here
+   except where the motion IS the color (desaturation in B).
+   ============================================================ */
+
+/* ---------- 0. State machine ----------
+   Four states, set as an attribute on the HUD root:
+       <div class="hud-root" data-state="idle|listening|thinking|responding">
+   JS, once per state change (no rAF):
+       root.dataset.state = s;
+       root.style.setProperty('--spd', s === 'responding' ? .55 : s === 'listening' ? .78 : s === 'thinking' ? 1.6 : 1);
+       root.style.setProperty('--vx',  s === 'responding' ? 1   : s === 'listening' ? .7  : s === 'thinking' ? .15 : .35);
+   NOTE --spd 1.6 in thinking: the WORLD SLOWS DOWN (higher multiplier = longer
+   duration) while the indicator speeds up. That contrast is the whole read. */
+
+/* ---------- 1. Keyframes ---------- */
+@keyframes st-spin      { to { transform: rotate(360deg); } }
+@keyframes st-spinr     { to { transform: rotate(-360deg); } }
+@keyframes st-pulse     { 0%, 100% { opacity: .45; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes st-breathe   { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+@keyframes st-bars      { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+@keyframes st-fill      { 0% { width: 6%; } 70% { width: 88%; } 100% { width: 92%; } }
+@keyframes st-arrow     { 0% { width: 0; } 100% { width: 100%; } }
+@keyframes st-sweep     { 0% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+@keyframes st-scanband  { 0% { transform: translateY(-8%); opacity: 0; } 20%, 80% { opacity: 1; } 100% { transform: translateY(108%); opacity: 0; } }
+@keyframes st-stutter   { 0%, 44% { transform: rotate(0deg); } 50%, 100% { transform: rotate(90deg); } }
+@keyframes st-narrow    { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.34); } }
+@keyframes st-scanx     { 0%, 100% { transform: translateX(-18%); } 50% { transform: translateX(18%); } }
+@keyframes st-dot       { 0%, 100% { opacity: .2; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-6px); } }
+@keyframes st-hop       { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes st-tick      { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+@keyframes st-caret     { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes st-glitch    { 0%, 90%, 100% { transform: translateX(0); } 93% { transform: translateX(-4px); } 96% { transform: translateX(3px); } }
+
+/* Every state element is hidden unless the root is in its state. */
+.hud-root:not([data-state="thinking"]) .st-think { display: none; }
+.hud-root[data-state="idle"] .st-voice { display: none; }
+
+/* ============================================================
+   2. OPTION A — CORE TAKEOVER  (always on, every skin)
+   The existing core changes behavior. Override the skin's own
+   core animation while [data-state="thinking"].
+   ============================================================ */
+.hud-root[data-state="thinking"] .stark-ring-1 { animation-duration: 1.1s; }
+.hud-root[data-state="thinking"] .stark-ring-2 { animation: st-spinr .9s linear infinite; }
+.hud-root[data-state="thinking"] .stark-ring-3 { animation-duration: .7s; }
+.hud-root[data-state="thinking"] .stark-ring-4 { animation-duration: .6s; }
+.hud-root[data-state="thinking"] .stark-core   { animation-duration: .8s; }
+
+.hud-root[data-state="thinking"] .gd-cube      { animation: st-stutter 1.4s cubic-bezier(.6,0,.4,1) infinite; }
+.hud-root[data-state="thinking"] .gd3-cube     { animation: st-stutter 1.4s cubic-bezier(.6,0,.4,1) infinite; }
+.hud-root[data-state="thinking"] .gd3-eye      { animation: st-narrow 1.4s ease-in-out infinite; }
+
+.hud-root[data-state="thinking"] .fn-eye-swirl { animation-duration: 2.4s; }
+.hud-root[data-state="thinking"] .fn-eye-core  { animation-duration: .7s; }
+
+.hud-root[data-state="thinking"] .rbx-part     { animation: st-hop .7s ease-in-out infinite; }
+.hud-root[data-state="thinking"] .rbx-studring { animation-duration: 1.2s; }
+
+.hud-root[data-state="thinking"] .mc-portal    { animation-duration: .9s; }
+.hud-root[data-state="thinking"] .mc2-portal-glow { animation-duration: .9s; }
+.hud-root[data-state="thinking"] .mc2-portal-star { animation-duration: 1.2s; }
+.hud-root[data-state="thinking"] .mc2-eye      { animation: none; }   /* eye holds still; the portal works */
+.hud-root[data-state="thinking"] .mc3-pupil    { animation: st-scanx 1.6s ease-in-out infinite; transition: none; }
+
+.hud-root[data-state="thinking"] .cy-ring-1    { animation: st-spin 1.4s steps(8) infinite; }
+.hud-root[data-state="thinking"] .cy-ring-3    { animation: st-spinr .9s steps(6) infinite; }
+.hud-root[data-state="thinking"] .cy-ring-4    { animation-duration: .6s; }
+.hud-root[data-state="thinking"] .cy-core      { animation-duration: .7s; }
+
+/* ============================================================
+   3. OPTION B — WORLD HOLDS ITS BREATH  (waits > 4s only)
+   Add [data-wait="long"] on the root after 4s of thinking.
+   ============================================================ */
+.hud-root[data-wait="long"] .hud-band,
+.hud-root[data-wait="long"] .hud-ground { animation-duration: 220s; filter: saturate(.3); }
+.hud-root[data-wait="long"] .hud-skin[data-active="true"] { filter: saturate(.55); transition: filter 900ms ease; }
+
+.st-scanband {                                  /* one per skin, inside the skin layer */
+  position: absolute; left: 0; right: 0; height: 34px; pointer-events: none;
+  animation: st-scanband 1.8s linear infinite;
+}
+/* skin-specific band tint is a color, so it lives in the skin file, e.g.
+   background: linear-gradient(180deg, transparent, rgba(103,232,249,.5), transparent);
+   minecraft/minecraft2/minecraft3 use steps(6) instead of linear.        */
+.st-scanband--stepped { animation-timing-function: steps(6); }
+
+/* ============================================================
+   4. OPTION C — GAME-NATIVE PROGRESS OBJECT  (primary indicator)
+   Each skin renders ONE of these in its own idiom. Determinate
+   whenever a real percentage exists; indeterminate otherwise.
+   ============================================================ */
+.st-arc              { animation: st-spin 1.4s linear infinite; }      /* stark: conic arc     */
+.st-arc-inner        { animation: st-spinr 3s linear infinite; }
+.st-bar-fill         { animation: st-fill 2.2s cubic-bezier(.2,.8,.3,1) infinite; }  /* gd/gd3/roblox */
+.st-bar-fill--det    { animation: none; transition: width 400ms cubic-bezier(.2,.8,.3,1); } /* real % */
+.st-coin-next        { animation: st-tick .8s ease-in-out infinite; }   /* gd3 empty coin       */
+.st-brick            { animation: st-hop .8s ease-in-out infinite; }    /* roblox: 4 bricks     */
+.st-brick:nth-child(2) { animation-delay: .13s; }
+.st-brick:nth-child(3) { animation-delay: .26s; }
+.st-brick:nth-child(4) { animation-delay: .39s; }
+.st-craft-arrow      { animation: st-arrow 1.9s steps(8) infinite; }   /* minecraft: 8 steps   */
+.st-craft-out        { animation: st-tick 1.2s steps(1) infinite; }
+.st-ram-block--active{ animation: st-breathe .7s ease-in-out infinite; }/* cyber: RAM blocks    */
+.st-ram-sweep        { animation: st-sweep 1.1s linear infinite; }
+
+/* ============================================================
+   5. OPTION D — CAPTION-LINE TELEGRAPH  (text fallback, always)
+   Sits exactly where the answer will render.
+   ============================================================ */
+.st-eq-bar           { transform-origin: 50% 100%; animation: st-bars .9s ease-in-out infinite; }
+.st-eq-bar:nth-child(2) { animation-delay: .12s; animation-duration: .78s; }
+.st-eq-bar:nth-child(3) { animation-delay: .24s; animation-duration: .96s; }
+.st-eq-bar:nth-child(4) { animation-delay: .36s; animation-duration: .84s; }
+.st-eq-bar:nth-child(5) { animation-delay: .48s; animation-duration: .9s;  }
+.st-chip             { animation: st-dot .8s ease-in-out infinite; }   /* gd2: 3 outlined chips */
+.st-chip:nth-child(2){ animation-delay: .16s; }
+.st-chip:nth-child(3){ animation-delay: .32s; }
+.st-spinner          { animation: st-spin .8s linear infinite; }       /* fortnite              */
+.st-caret            { animation: st-caret 1s steps(1) infinite; }     /* minecraft*            */
+.st-pixel-dot        { animation: st-breathe 1.2s steps(2) infinite; }
+.st-pixel-dot:nth-child(2) { animation-delay: .3s; }
+.st-pixel-dot:nth-child(3) { animation-delay: .6s; }
+.st-proc-text        { animation: st-glitch 1.4s steps(1) infinite; }  /* cyber                 */
+.st-proc-sweep       { animation: st-sweep .9s linear infinite; }
+
+/* ============================================================
+   6. VOICE RING  (listening + responding)
+   THE THREE RULES:
+   1. Drive exactly ONE geometric property from amplitude.
+   2. Never map amplitude to glow, blur or color.
+   3. Stagger phase across elements — perfect symmetry reads mechanical.
+
+   Feed it ONE smoothed value, written to a variable, nothing else:
+
+     const a = ctx.createAnalyser(); a.fftSize = 256;
+     a.smoothingTimeConstant = 0.8;              // rule 1: smooth in the analyser
+     const buf = new Uint8Array(a.frequencyBinCount);
+     let level = 0;
+     (function loop() {
+       a.getByteFrequencyData(buf);
+       let s = 0; for (let i = 0; i < 24; i++) s += buf[i];      // low 24 bins = voice
+       const raw = Math.min(1, s / (24 * 210));
+       level += (raw - level) * 0.22;                            // second-order smoothing
+       root.style.setProperty('--vx', level.toFixed(3));
+       requestAnimationFrame(loop);
+     })();
+
+   Then every ring below is pure CSS off --vx. This is the ONE place a
+   per-frame rAF loop is correct — it writes a single custom property.
+   ============================================================ */
+
+/* generic: a bar whose height tracks amplitude, with per-bar phase offset */
+.st-vbar {
+  transform-origin: 50% 100%;
+  transform: scaleY(calc(.22 + var(--vx) * .78));
+  transition: transform 90ms linear;
+}
+.st-vbar:nth-child(2) { transform: scaleY(calc(.22 + var(--vx) * .94)); }
+.st-vbar:nth-child(3) { transform: scaleY(calc(.30 + var(--vx) * 1.05)); }
+.st-vbar:nth-child(4) { transform: scaleY(calc(.22 + var(--vx) * .88)); }
+.st-vbar:nth-child(5) { transform: scaleY(calc(.18 + var(--vx) * .72)); }
+
+/* per-skin ring: exactly one property each */
+.vr-stark-tick   { transform-origin: 50% 100%; transform: scaleY(calc(.25 + var(--vx) * .9)); transition: transform 90ms linear; }
+.vr-stark-orbit  { animation: st-spin 14s linear infinite; }                         /* constant, NOT amplitude */
+.vr-gd-halo      { transform: scale(calc(.9 + var(--vx) * .22)); transition: transform 110ms linear; }
+.vr-gd2-bar      { transform-origin: 50% 50%; transform: scaleY(calc(.34 + var(--vx) * .8)); transition: transform 90ms linear; }
+.vr-gd3-mouth    { transform-origin: 50% 50%; transform: scaleY(calc(.4 + var(--vx) * 1.1)); transition: transform 80ms linear; }
+.vr-fn-wave      { transform: scale(calc(.92 + var(--vx) * .16)); transition: transform 130ms linear; }
+.vr-fn-wave--2   { transform: scale(calc(.9 + var(--vx) * .2)); transition: transform 130ms linear 60ms; }
+.vr-rbx-brick    { transform-origin: 50% 100%; transform: scaleY(calc(.3 + var(--vx) * .9)); transition: transform 100ms linear; }
+.vr-mc-block     { transform-origin: 50% 100%; transform: scaleY(calc(.25 + round(var(--vx) * 4) * .1875)); transition: transform 120ms steps(3); }
+.vr-mc2-eye      { opacity: calc(.25 + var(--vx) * .75); transition: opacity 110ms linear; }
+.vr-mc3-pupil    { transform-origin: 50% 50%; transform: scaleY(calc(.72 + var(--vx) * .42)); transition: transform 140ms cubic-bezier(.4,0,.2,1); }
+.vr-cy-bar       { transform-origin: 50% 100%; transform: scaleY(calc(.2 + var(--vx) * .95)); transition: transform 70ms linear; }
+.vr-cy-frame     { animation: st-pulse .55s ease-in-out infinite; }                  /* constant, NOT amplitude */
+
+/* ---------- 7. Accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hud-root [class^="st-"], .hud-root [class^="vr-"] {
+    animation-duration: 0s !important; animation-iteration-count: 1 !important; transition: none !important;
+  }
+  .st-think { /* keep a static, legible indicator instead of hiding it */ opacity: 1; }
+}
