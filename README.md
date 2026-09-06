@@ -15,6 +15,10 @@ You'll need a Mac (Apple Silicon recommended), [Homebrew](https://brew.sh),
 Python 3.11+, and either a [Claude Code](https://claude.com/claude-code) login
 or an `ANTHROPIC_API_KEY`.
 
+New to the Terminal, Homebrew, or Python? Start with
+[MAC-SETUP.md](MAC-SETUP.md) — it walks through installing all three from
+scratch, then sends you back here.
+
 ```bash
 git clone https://github.com/quirkbyte/jarvis.git
 cd jarvis
