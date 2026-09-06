@@ -1,0 +1,83 @@
+/* The palette lives here and only here; the canvas reads it back through
+   getComputedStyle, so there is one source of truth for the colours rather
+   than a CSS copy and a JavaScript copy that drift apart.
+
+   Only the default JARVIS look (the canvas reactor) uses this palette now —
+   gd/fortnite/roblox have all migrated to DOM/CSS skins (skin-*.css) with
+   their own self-contained colour variables, per handoff/HUD-STYLE.md. */
+:root {
+  --bg-void:    #03070c;
+  --bg-deep:    #061119;
+  --grid:       rgba(0, 217, 255, 0.07);
+  --grid-major: rgba(0, 217, 255, 0.14);
+
+  --cyan:       #00d9ff;
+  --cyan-dim:   rgba(0, 217, 255, 0.35);
+  --cyan-glow:  rgba(0, 217, 255, 0.55);
+  --cyan-pale:  #a8ecff;
+
+  --amber:      #ffb545;
+  --amber-dim:  rgba(255, 181, 69, 0.35);
+
+  --accent2:      #ff5fd9;
+  --accent2-dim:  rgba(255, 95, 217, 0.35);
+  --accent3:      #7cff6b;
+
+  --red:        #ff4d5e;
+
+  --text:       #cfe9f5;
+  --text-dim:   rgba(207, 233, 245, 0.45);
+  --text-faint: rgba(207, 233, 245, 0.20);
+
+  --font: 'Rajdhani', 'Eurostile', 'DIN Alternate', system-ui, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;              /* no scrollbars, ever */
+  background: var(--bg-void);
+  color: var(--text);
+  font-family: var(--font);
+  cursor: none;                  /* there is nothing here to click */
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+#hud { display: block; width: 100vw; height: 100vh; }
+
+/* Revealed by "/". Deliberately indistinguishable from the drawn interface:
+   no border, no background, no focus ring. z-index above #skins-root (5)
+   and its flash/vignette overlays (6) — without it, this sat in the
+   default stacking layer and rendered invisibly behind any active DOM
+   skin, unhidden and focused but never actually seen. */
+#entry {
+  position: fixed;
+  z-index: 10;
+  left: 50%;
+  bottom: 168px;
+  transform: translateX(-50%);
+  width: min(720px, 70vw);
+  padding: 10px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--cyan-dim);
+  background: rgba(3, 7, 12, 0.85);
+  color: var(--cyan-pale);
+  font-family: var(--font);
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  caret-color: var(--cyan);
+  outline: none;
+  cursor: text;
+}
+#entry::placeholder { color: var(--text-faint); }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Rotation stops in the canvas renderer (hud.js's `reduced` flag); nothing
+     else on the canvas path needs to move either. The DOM skins (skins.css)
+     are excluded — they handle reduced motion themselves, more gently, by
+     pausing only rotation rather than freezing the whole scene. */
+  *:not(#skins-root):not(#skins-root *) { transition: none !important; animation: none !important; }
+}

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>J.A.R.V.I.S.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Rajdhani is the only font the default JARVIS canvas look needs. -->
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;600&display=swap"
+      rel="stylesheet">
+<link rel="stylesheet" href="/static/hud.css">
+<link rel="stylesheet" href="/static/skins.css">
+</head>
+<body>
+  <!-- One canvas. Everything is drawn; nothing here is a widget. This is
+       the whole interface. -->
+  <canvas id="hud"></canvas>
+
+  <!-- Empty on purpose: skins.js's shared layer-stack engine (applyState,
+       feedVoice, activate, sync) reads/writes this element unconditionally
+       from hud.js's main loop every frame, so it must exist even though
+       this build ships no DOM/CSS skins to put inside it. skins.css keeps
+       it hidden while the canvas theme (the only theme here) is active. -->
+  <div id="skins-root" class="hud-root">
+    <div id="skins-inner"></div>
+    <div id="skins-flash"></div>
+    <div id="skins-vignette"></div>
+  </div>
+
+  <!-- The one exception, and it is hidden until "/" summons it: you cannot
+       type into a canvas. Styled to look drawn rather than like a form. -->
+  <input id="entry" type="text" spellcheck="false" autocomplete="off"
+         aria-label="type a command" hidden>
+
+  <script src="/static/waveform.js"></script>
+  <script src="/static/reactor.js"></script>
+  <script src="/static/skins.js"></script>
+  <script src="/static/themes.js"></script>
+  <script src="/static/panels.js"></script>
+  <script src="/static/boot.js"></script>
+  <script src="/static/hud.js"></script>
+</body>
+</html>

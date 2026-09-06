@@ -1,0 +1,124 @@
+/* The DOM/CSS layer-stack engine for the reskinned HUD themes, per
+   handoff/HUD-STYLE.md. The default JARVIS look stays the canvas in hud.css/
+   hud.js, untouched; this file only governs what appears when a *skin*
+   (gd, gd2, fortnite, roblox, minecraft, cyber) is active instead.
+
+   Three variables carry all state-driven motion, set on <html> by skins.js
+   on every state change (not per frame) — a CSS animation's duration reacts
+   to --spd on its own the instant the variable changes, which is the whole
+   point: the world speeds up while JARVIS talks with zero JS per frame. */
+:root {
+  --spd: 1;      /* world speed multiplier: idle 1, listening .78, responding .55 */
+  --vx: .35;     /* voice energy: idle .35, listening .7, responding 1 */
+  --imm: .8;     /* immersion 1-10 -> n/10; multiplies world-layer opacity only */
+}
+
+/* handoff/STATES.md §5 frames the voice ring as covering listening and
+   responding, with A-D covering thinking — hud-states.css's own rule only
+   hides .st-voice during idle, though, so a dedicated voice-ring element
+   (the ones built as new elements rather than reusing an at-rest part —
+   stark's ticks, gd2's bars, fortnite's rings, roblox's bricks, minecraft's
+   blocks, cyber's bars) stayed visible through thinking too. That's what
+   produced roblox's "two rows of the same four colors" complaint: the
+   voice ring and the Option C loader, both real, sitting one above the
+   other during thinking. Hiding it there as well removes the redundancy
+   without touching the reused-element rings (those live inside the core
+   itself, not as a separate floating widget, so they never had this
+   problem). */
+.hud-root[data-state="thinking"] .st-voice { display: none; }
+
+#skins-root {
+  position: fixed;
+  inset: 0;
+  perspective: 1600px;
+  z-index: 5;
+  display: none;
+  cursor: none;
+}
+html[data-skin-mode="layer"] #skins-root { display: block; }
+html[data-skin-mode="layer"] #hud { display: none; }
+
+#skins-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+/* Only one skin-layer is ever opacity:1. All stay mounted so their CSS
+   animations never restart — unmounting a layer to save paint is what kills
+   the illusion of a world that was running the whole time. */
+.skin-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 900ms cubic-bezier(.4, 0, .2, 1);
+  pointer-events: none;
+  overflow: hidden;
+}
+.skin-layer[data-active="true"] { opacity: 1; }
+
+.skin-world   { position: absolute; inset: 0; transform-style: preserve-3d;
+                overflow: hidden; opacity: var(--imm); }
+.skin-core    { position: absolute; inset: 0; transform: translateZ(40px);
+                display: flex; align-items: center; justify-content: center; }
+.skin-chrome  { position: absolute; top: 0; left: 0; right: 0; height: 56px;
+                transform: translateZ(70px);
+                display: flex; align-items: center; justify-content: space-between;
+                padding: 0 28px; }
+.skin-panels  { position: absolute; inset: 0; transform: translateZ(90px); }
+.skin-panels .rail-left  { position: absolute; left: 16px; top: 72px; width: 248px; }
+.skin-panels .rail-right { position: absolute; right: 16px; top: 72px; width: 300px; }
+.skin-caption { position: absolute; left: 24px; right: 24px; bottom: 22px;
+                transform: translateZ(110px); }
+
+#skins-flash {
+  position: absolute; inset: 0; pointer-events: none; z-index: 6;
+  background: radial-gradient(circle at 50% 45%, #fff, transparent 60%);
+  opacity: 0;
+}
+#skins-flash.fire { animation: skin-flash 160ms ease-out; }
+@keyframes skin-flash { 0% { opacity: .75; } 100% { opacity: 0; } }
+
+/* Non-negotiable #1 (handoff/HUD-STYLE.md §5): every skin gets this, always —
+   it's what makes a bright world (roblox, gd2) still read as a screen. */
+#skins-vignette {
+  position: absolute; inset: 0; pointer-events: none; z-index: 6;
+  box-shadow: inset 0 0 220px 60px rgba(0, 0, 0, .65);
+}
+
+/* ---- motion language, shared by every skin (handoff/HUD-STYLE.md §2) ---- */
+@keyframes scrollx  { to { transform: translate3d(-50%, 0, 0); } }
+@keyframes scrolly  { to { transform: translate3d(0, 96px, 0); } }
+@keyframes spin     { to { transform: rotate(360deg); } }
+@keyframes spinr    { to { transform: rotate(-360deg); } }
+@keyframes pulse    { 0%, 100% { opacity: .5; transform: scale(1); }
+                       50% { opacity: 1; transform: scale(1.09); } }
+@keyframes bob      { 0%, 100% { transform: translateY(0) rotate(-3deg); }
+                       50% { transform: translateY(-18px) rotate(3deg); } }
+@keyframes breathe  { 0%, 100% { opacity: .35; } 50% { opacity: .9; } }
+@keyframes wave     { 0%, 100% { transform: scaleY(.18); } 50% { transform: scaleY(1); } }
+@keyframes rain     { to { transform: translate(-40px, 400px); } }
+@keyframes flick    { 0%, 19%, 21%, 54%, 56%, 100% { opacity: 1; } 20%, 55% { opacity: .4; } }
+@keyframes glitchx  { 0%, 90%, 100% { transform: translateX(0); }
+                       92% { transform: translateX(6px); }
+                       94% { transform: translateX(-6px); }
+                       96% { transform: translateX(3px); } }
+
+/* A parallax band is width:200% and loops scrollx; the caller sets
+   --pspeed (its base duration at --spd:1) and picks a vertical position. */
+.parallax-layer {
+  position: absolute;
+  width: 200%;
+  animation: scrollx linear infinite;
+  animation-duration: calc(var(--spd) * var(--pspeed, 20s));
+}
+
+/* Light touch, matching the existing canvas JARVIS theme's own precedent
+   (hud.js zeroes ring-spin speed under reduced motion but keeps the core's
+   breathing pulse running, since that's plain per-frame JS, not CSS). A
+   static skin is an explicit failure per handoff/ANIMATION.md, so reduced
+   motion here only freezes rotation (mark an element `.spins` to opt in) —
+   scrolling, pulsing and breathing keep the world feeling alive either way. */
+@media (prefers-reduced-motion: reduce) {
+  #skins-root .spins { animation-play-state: paused; }
+}

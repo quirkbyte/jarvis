@@ -1,0 +1,25 @@
+line-length = 100
+target-version = "py311"
+
+# The spec pack is source material, not source. ruff formats python inside
+# markdown fences, which would rewrite the reference docs — keep it out.
+extend-exclude = ["*.md", "reference", "specs"]
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "BLE", "SIM", "RUF", "ASYNC", "T20"]
+ignore = [
+    "B008",    # FastAPI's Depends() idiom, needed from phase 5 on
+    "RUF001",  # the HUD labels use "·"; that is deliberate
+]
+
+[lint.per-file-ignores]
+"scripts/*" = ["T20"]        # the doctor's whole output is print()
+"jarvis/__main__.py" = ["T20"]
+"jarvis/main.py" = ["T20"]        # the console transcript is the interface
+"jarvis/boot.py" = ["T20"]        # the one-line startup summary
+"jarvis/console.py" = ["T20"]
+"jarvis/session.py" = ["T20"]
+"tests/*" = ["T20"]
+
+[format]
+quote-style = "double"

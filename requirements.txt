@@ -1,0 +1,32 @@
+# JARVIS runtime. The stack is chosen in BUILD.md, not assembled by taste —
+# pinned so that a working machine stays working. Versions verified together on
+# macOS 15 / arm64 / CPython 3.14 on 29 August 2026.
+
+# --- audio in and out -------------------------------------------------------
+numpy==2.5.2
+sounddevice==0.5.6            # PortAudio; needs `brew install portaudio`
+webrtcvad-wheels==2.0.14      # prebuilt; plain webrtcvad needs a compiler
+
+# --- wake word --------------------------------------------------------------
+openwakeword==0.6.0           # ships the pretrained hey_jarvis model
+onnxruntime==1.29.0           # inference_framework="onnx"; tflite is Linux-only
+
+# --- speech to text ---------------------------------------------------------
+parakeet-mlx==0.5.2 ; platform_machine == "arm64"
+faster-whisper==1.2.1 ; platform_machine != "arm64"
+
+# --- the brain --------------------------------------------------------------
+claude-agent-sdk==0.2.148
+
+# --- speech out -------------------------------------------------------------
+elevenlabs==2.65.0            # optional at runtime; `say -v Daniel` is the fallback
+
+# --- HUD ---------------------------------------------------------------------
+psutil==7.2.2                 # telemetry: cpu, memory, disk, battery, network
+fastapi==0.141.1              # HUD transport
+uvicorn==0.52.4
+websockets==17.1          # FastAPI WebSocket transport for the HUD
+
+# --- development ------------------------------------------------------------
+pytest==9.1.1
+ruff==0.16.5
