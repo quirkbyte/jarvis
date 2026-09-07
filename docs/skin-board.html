@@ -139,8 +139,6 @@
     flex: none;
   }
   .card.free .price { background: rgba(94, 234, 212, .14); color: #5eead4; }
-  a.price.buy { text-decoration: none; cursor: pointer; transition: background .15s, color .15s; }
-  a.price.buy:hover { background: var(--accent); color: var(--bg); }
 
   .stage {
     position: relative;
@@ -166,6 +164,33 @@
   }
   .caption .q { color: var(--accent-dim); }
   .caption .a { color: var(--ink); display: block; margin-top: 2px; }
+
+  .cta {
+    display: block;
+    text-align: center;
+    padding: 13px;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .08em;
+    text-decoration: none;
+    border-top: 1px solid var(--panel-border);
+  }
+  .cta.buy {
+    background: var(--accent);
+    color: var(--bg);
+    cursor: pointer;
+    transition: background .15s, filter .15s;
+  }
+  .cta.buy:hover { filter: brightness(1.12); }
+  .cta.soon {
+    color: var(--ink-dim);
+    background: transparent;
+  }
+  .cta.included {
+    color: #5eead4;
+    background: rgba(94, 234, 212, .08);
+  }
 
   footer {
     max-width: 1400px;
@@ -201,7 +226,7 @@
     { n: '03', id: 'gd3', name: 'Geometry Dash · Icon', tag: 'GOLD CUBE · APP ICON', link: null },
     { n: '04', id: 'gd2', name: 'Geometry Dash · Pastel', tag: 'SUNSET PASTEL · HARD SHADOWS', link: null },
     { n: '05', id: 'fortnite', name: 'Fortnite', tag: 'STORM EYE · BATTLE BUS SKY', link: null },
-    { n: '06', id: 'roblox', name: 'Roblox', tag: 'STUD RING · BASEPLATE', link: null },
+    { n: '06', id: 'roblox', name: 'Roblox', tag: 'STUD RING · BASEPLATE', link: 'https://buy.stripe.com/test_bJe3cw2qgcZscrLcG7g7e00' },
     { n: '07', id: 'minecraft', name: 'Minecraft', tag: 'PORTAL · TORCH FLICKER', link: null },
     { n: '08', id: 'minecraft2', name: 'Minecraft · The End', tag: 'END PORTAL · EYE OF ENDER', link: null },
     { n: '09', id: 'minecraft3', name: 'Minecraft · Stronghold', tag: 'STRONGHOLD · DILATING PUPIL', link: null },
@@ -210,9 +235,15 @@
   ];
 
   // Each paid skin's `link` is its live Stripe Payment Link (buy.stripe.com/...,
-  // never a test_ one) — set once per skin as it goes live. Renders as a real
-  // "Buy" link when present, a plain unclickable $1 label otherwise, so nothing
-  // ever points at a broken or test-mode checkout.
+  // never a test_ one) — set once per skin as it goes live. The header badge is
+  // just a price label; the actual call to action is the full-width button
+  // below the caption, so it can't be mistaken for decoration.
+  function cta(s) {
+    if (s.free) return '<span class="cta included">✓ INCLUDED WITH JARVIS</span>';
+    if (s.link) return `<a class="cta buy" href="${s.link}" target="_blank" rel="noopener">BUY THIS SKIN — $1</a>`;
+    return '<span class="cta soon">COMING SOON</span>';
+  }
+
   const grid = document.getElementById('grid');
   grid.innerHTML = SKINS.map(s => `
     <div class="card ${s.free ? 'free' : ''}">
@@ -220,11 +251,7 @@
         <span class="num">${s.n}</span>
         <span class="name">${s.name}</span>
         <span class="tag">${s.tag}</span>
-        ${s.free
-          ? '<span class="price">FREE</span>'
-          : s.link
-            ? `<a class="price buy" href="${s.link}" target="_blank" rel="noopener">$1 · BUY</a>`
-            : '<span class="price">$1</span>'}
+        <span class="price">${s.free ? 'FREE' : '$1'}</span>
       </div>
       <div class="stage">
         <video src="skin-clips/${s.id}.mp4" autoplay loop muted playsinline></video>
@@ -233,6 +260,7 @@
         <span class="q">&gt; what's my battery at</span>
         <span class="a">Eighty-two percent, and not charging.</span>
       </div>
+      ${cta(s)}
     </div>
   `).join('');
 </script>
