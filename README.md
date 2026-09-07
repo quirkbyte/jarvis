@@ -9,7 +9,7 @@ Two halves, cleanly separated: a headless voice/agent core that works with the
 HUD switched off, and a HUD that's just a view fed by a WebSocket — kill it and
 JARVIS keeps talking.
 
-![The default JARVIS HUD, at standby](docs/screenshots/default-hud.png)
+![The default JARVIS HUD, animating](docs/screenshots/default-hud.gif)
 
 ## Quickstart
 
