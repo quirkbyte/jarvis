@@ -53,6 +53,10 @@ there, and nothing in it is required to get started. Once you have a key, run
 - A cinematic full-screen HUD: a reactive arc-reactor core, live waveform,
   system telemetry, transcript.
 
+🎨 Want more looks? **[See all the skins](https://quirkbyte.github.io/jarvis/skin-board.html)**
+— ten more HUD worlds (Minecraft, Roblox, Fortnite, Cyberpunk, Geometry Dash)
+sold separately, real captures of each one animating.
+
 ## How it's built
 
 - **Core**: async Python. Wake word (`openwakeword`) → speech-to-text →
