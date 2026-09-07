@@ -139,6 +139,8 @@
     flex: none;
   }
   .card.free .price { background: rgba(94, 234, 212, .14); color: #5eead4; }
+  a.price.buy { text-decoration: none; cursor: pointer; transition: background .15s, color .15s; }
+  a.price.buy:hover { background: var(--accent); color: var(--bg); }
 
   .stage {
     position: relative;
@@ -195,18 +197,22 @@
 <script>
   const SKINS = [
     { n: '01', id: 'reactor', name: 'Default Core', tag: 'CANVAS · FREE DEFAULT', free: true },
-    { n: '02', id: 'gd', name: 'Geometry Dash', tag: 'SPIKE HALO · NEON DUSK' },
-    { n: '03', id: 'gd3', name: 'Geometry Dash · Icon', tag: 'GOLD CUBE · APP ICON' },
-    { n: '04', id: 'gd2', name: 'Geometry Dash · Pastel', tag: 'SUNSET PASTEL · HARD SHADOWS' },
-    { n: '05', id: 'fortnite', name: 'Fortnite', tag: 'STORM EYE · BATTLE BUS SKY' },
-    { n: '06', id: 'roblox', name: 'Roblox', tag: 'STUD RING · BASEPLATE' },
-    { n: '07', id: 'minecraft', name: 'Minecraft', tag: 'PORTAL · TORCH FLICKER' },
-    { n: '08', id: 'minecraft2', name: 'Minecraft · The End', tag: 'END PORTAL · EYE OF ENDER' },
-    { n: '09', id: 'minecraft3', name: 'Minecraft · Stronghold', tag: 'STRONGHOLD · DILATING PUPIL' },
-    { n: '10', id: 'cyber', name: 'Cyberpunk', tag: 'NEON SKYLINE · GLOW ONLY' },
-    { n: '11', id: 'stark', name: 'Stark Workshop', tag: 'DOM REMAKE · FULL STATE SYSTEM' },
+    { n: '02', id: 'gd', name: 'Geometry Dash', tag: 'SPIKE HALO · NEON DUSK', link: null },
+    { n: '03', id: 'gd3', name: 'Geometry Dash · Icon', tag: 'GOLD CUBE · APP ICON', link: null },
+    { n: '04', id: 'gd2', name: 'Geometry Dash · Pastel', tag: 'SUNSET PASTEL · HARD SHADOWS', link: null },
+    { n: '05', id: 'fortnite', name: 'Fortnite', tag: 'STORM EYE · BATTLE BUS SKY', link: null },
+    { n: '06', id: 'roblox', name: 'Roblox', tag: 'STUD RING · BASEPLATE', link: null },
+    { n: '07', id: 'minecraft', name: 'Minecraft', tag: 'PORTAL · TORCH FLICKER', link: null },
+    { n: '08', id: 'minecraft2', name: 'Minecraft · The End', tag: 'END PORTAL · EYE OF ENDER', link: null },
+    { n: '09', id: 'minecraft3', name: 'Minecraft · Stronghold', tag: 'STRONGHOLD · DILATING PUPIL', link: null },
+    { n: '10', id: 'cyber', name: 'Cyberpunk', tag: 'NEON SKYLINE · GLOW ONLY', link: null },
+    { n: '11', id: 'stark', name: 'Stark Workshop', tag: 'DOM REMAKE · FULL STATE SYSTEM', link: null },
   ];
 
+  // Each paid skin's `link` is its live Stripe Payment Link (buy.stripe.com/...,
+  // never a test_ one) — set once per skin as it goes live. Renders as a real
+  // "Buy" link when present, a plain unclickable $1 label otherwise, so nothing
+  // ever points at a broken or test-mode checkout.
   const grid = document.getElementById('grid');
   grid.innerHTML = SKINS.map(s => `
     <div class="card ${s.free ? 'free' : ''}">
@@ -214,7 +220,11 @@
         <span class="num">${s.n}</span>
         <span class="name">${s.name}</span>
         <span class="tag">${s.tag}</span>
-        <span class="price">${s.free ? 'FREE' : '$1'}</span>
+        ${s.free
+          ? '<span class="price">FREE</span>'
+          : s.link
+            ? `<a class="price buy" href="${s.link}" target="_blank" rel="noopener">$1 · BUY</a>`
+            : '<span class="price">$1</span>'}
       </div>
       <div class="stage">
         <video src="skin-clips/${s.id}.mp4" autoplay loop muted playsinline></video>
