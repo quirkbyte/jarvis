@@ -27,6 +27,40 @@ make doctor    # checks this Mac and names the fix for anything missing
 make run       # the assistant, listening for "Hey JARVIS"
 ```
 
+If `make run` refuses to start with "JARVIS can't reach Claude yet," you need
+one of the two things below — pick whichever applies to you.
+
+### Connecting Claude
+
+JARVIS needs a way to actually talk to Claude. Two options; you only need one.
+
+**Option 1 — Claude Code login** (use this if you already pay for Claude Pro
+or Max):
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash   # installs the Claude Code CLI
+claude                                            # opens a browser to log in
+```
+
+Sign in with your Claude.ai account when the browser opens. Once you see
+"Login successful," JARVIS will reuse that login automatically — nothing
+else to configure. **This only works with a paid Claude Pro or Max plan** —
+a free Claude.ai account won't work here.
+
+**Option 2 — An API key** (use this if you don't have Claude Pro/Max, or
+would rather pay only for what JARVIS actually uses):
+
+1. Go to [console.anthropic.com](https://console.anthropic.com), sign up,
+   and create an API key.
+2. Copy `.env.example` to `.env` (if you haven't already) and add the line:
+   ```
+   ANTHROPIC_API_KEY=sk-ant-...
+   ```
+3. That's it — `make run` will pick it up automatically.
+
+Either way, run `make doctor` afterward to confirm it's recognized — look
+for `anthropic auth` in the output.
+
 No microphone handy, or just want to see it work first?
 
 ```bash

@@ -68,6 +68,23 @@ def main(argv: list[str] | None = None) -> int:
 
     from jarvis.brain import last_session
     from jarvis.session import run, run_text
+    from scripts._report import FAIL
+    from scripts.doctor import check_credentials
+
+    # Voice and text mode both need Claude reachable, and the console is
+    # deliberately quiet otherwise (jarvis/logging.py: one line per turn) — so
+    # a missing key or login has to fail loudly here, not surface later as
+    # "nothing happened." Reuses `make doctor`'s own check rather than a
+    # second copy of the same logic.
+    anthropic_auth = next(c for c in check_credentials() if c.name == "anthropic auth")
+    if anthropic_auth.status == FAIL:
+        print(
+            "JARVIS can't reach Claude yet — " + anthropic_auth.fix + ".\n"
+            "See README.md's \"Connecting Claude\" section, or run `make doctor` "
+            "for the full environment check.",
+            file=sys.stderr,
+        )
+        return 1
 
     resume = last_session(config.session_path) if args.resume else None
     if args.resume and resume is None:
